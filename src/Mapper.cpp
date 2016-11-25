@@ -1876,6 +1876,16 @@ namespace karto
         "Whether to increase the search space if no good matches are initially "
         "found.",
         false, GetParameterManager());
+
+    m_pOdometryCovarianceDistance = new Parameter<kt_double>(
+        "OdometryCovarianceDistance",
+        "",
+        0.0, GetParameterManager());
+
+    m_pOdometryCovarianceAngular = new Parameter<kt_double>(
+        "OdometryCovarianceAngular",
+        "",
+        0.0, GetParameterManager());
   }
   /* Adding in getters and setters here for easy parameter access */
 
@@ -2027,6 +2037,16 @@ namespace karto
     return static_cast<bool>(m_pUseResponseExpansion->GetValue());
   }
 
+  double Mapper::getParamOdometryCovarianceDistance()
+  {
+    return static_cast<double>(m_pOdometryCovarianceDistance->GetValue());
+  }
+
+  double Mapper::getParamOdometryCovarianceAngular()
+  {
+    return static_cast<double>(m_pOdometryCovarianceAngular->GetValue());
+  }
+
   /* Setters for parameters */
   // General Parameters
   void Mapper::setParamUseScanMatching(bool b)
@@ -2172,6 +2192,16 @@ namespace karto
   void Mapper::setParamUseResponseExpansion(bool b)
   {
     m_pUseResponseExpansion->SetValue((kt_bool)b);
+  }
+
+  void Mapper::setParamOdometryCovarianceDistance(double d)
+  {
+    m_pOdometryCovarianceDistance->SetValue((kt_double)d);
+  }
+
+  void Mapper::setParamOdometryCovarianceAngular(double d)
+  {
+    m_pOdometryCovarianceAngular->SetValue((kt_double)d);
   }
 
 
