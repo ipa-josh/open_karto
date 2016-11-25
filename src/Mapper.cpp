@@ -510,6 +510,26 @@ namespace karto
               << rCovariance(0, 0) << ", " << rCovariance(1, 1) << std::endl;
 #endif
     assert(math::InRange(rMean.GetHeading(), -KT_PI, KT_PI));
+    
+    if( m_pMapper->m_pOdometryCovarianceDistance->GetValue()>0 && m_pMapper->m_pOdometryCovarianceAngular->GetValue()>0) {
+      Pose2Vector means;
+      std::vector<Matrix3> covariances;
+		
+      Pose2 odom; Matrix3 odomC;
+                                   
+      odom = scanPose;
+
+      odomC(0, 0) = odomC(1, 1) = math::Square(m_pMapper->m_pOdometryCovarianceDistance->GetValue());  // TH*TH;  // YY
+      odomC(2, 2) = math::Square(m_pMapper->m_pOdometryCovarianceAngular->GetValue());  // TH*TH
+
+      means.push_back(odom);
+      covariances.push_back(odomC);
+      
+      means.push_back(rMean);
+      covariances.push_back(rCovariance);
+			
+      rMean = ComputeWeightedMean(means, covariances);
+    }
 
     return bestResponse;
   }
