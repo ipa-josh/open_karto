@@ -1573,50 +1573,6 @@ namespace karto
     return nearLinkedScans;
   }
 
-  Pose2 MapperGraph::ComputeWeightedMean(const Pose2Vector& rMeans, const std::vector<Matrix3>& rCovariances) const
-  {
-    assert(rMeans.size() == rCovariances.size());
-
-    // compute sum of inverses and create inverse list
-    std::vector<Matrix3> inverses;
-    inverses.reserve(rCovariances.size());
-
-    Matrix3 sumOfInverses;
-    const_forEach(std::vector<Matrix3>, &rCovariances)
-    {
-      Matrix3 inverse = iter->Inverse();
-      inverses.push_back(inverse);
-
-      sumOfInverses += inverse;
-    }
-    Matrix3 inverseOfSumOfInverses = sumOfInverses.Inverse();
-
-    // compute weighted mean
-    Pose2 accumulatedPose;
-    kt_double thetaX = 0.0;
-    kt_double thetaY = 0.0;
-
-    Pose2Vector::const_iterator meansIter = rMeans.begin();
-    const_forEach(std::vector<Matrix3>, &inverses)
-    {
-      Pose2 pose = *meansIter;
-      kt_double angle = pose.GetHeading();
-      thetaX += cos(angle);
-      thetaY += sin(angle);
-
-      Matrix3 weight = inverseOfSumOfInverses * (*iter);
-      accumulatedPose += weight * pose;
-
-      ++meansIter;
-    }
-
-    thetaX /= rMeans.size();
-    thetaY /= rMeans.size();
-    accumulatedPose.SetHeading(atan2(thetaY, thetaX));
-
-    return accumulatedPose;
-  }
-
   LocalizedRangeScanVector MapperGraph::FindPossibleLoopClosure(LocalizedRangeScan* pScan,
                                                                 const Name& rSensorName,
                                                                 kt_int32u& rStartNum)
