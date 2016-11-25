@@ -349,6 +349,56 @@ namespace karto
     return pScanMatcher;
   }
 
+
+  /**
+   * Compute mean of poses weighted by covariances
+   * @param rMeans
+   * @param rCovariances
+   * @return weighted mean
+   */
+  Pose2 ComputeWeightedMean(const Pose2Vector& rMeans, const std::vector<Matrix3>& rCovariances)
+  {
+    assert(rMeans.size() == rCovariances.size());
+
+    // compute sum of inverses and create inverse list
+    std::vector<Matrix3> inverses;
+    inverses.reserve(rCovariances.size());
+
+    Matrix3 sumOfInverses;
+    const_forEach(std::vector<Matrix3>, &rCovariances)
+    {
+      Matrix3 inverse = ((*iter)*1000.).Inverse();
+      inverses.push_back(inverse);
+
+      sumOfInverses += inverse;
+    }
+    Matrix3 inverseOfSumOfInverses = sumOfInverses.Inverse();
+
+    // compute weighted mean
+    Pose2 accumulatedPose;
+    kt_double thetaX = 0.0;
+    kt_double thetaY = 0.0;
+
+    Pose2Vector::const_iterator meansIter = rMeans.begin();
+    const_forEach(std::vector<Matrix3>, &inverses)
+    {
+      Pose2 pose = *meansIter;
+      kt_double angle = pose.GetHeading();
+
+      Matrix3 weight = inverseOfSumOfInverses * (*iter);
+      accumulatedPose += weight * pose;
+      
+      thetaX += weight(2,2)*cos(angle);
+      thetaY += weight(2,2)*sin(angle);
+
+      ++meansIter;
+    }
+
+    accumulatedPose.SetHeading(atan2(thetaY, thetaX));
+
+    return accumulatedPose;
+  }
+  
   /**
    * Match given scan against set of scans
    * @param pScan scan being scan-matched
