@@ -798,6 +798,8 @@ namespace karto
     kt_double startY = -offsetY;
     assert(math::DoubleEqual(startY + (nY - 1) * rSearchSpaceResolution.GetY(), -startY));
 
+    dx=0;
+    dy=0;
     for (kt_int32u yIndex = 0; yIndex < nY; yIndex++)
     {
       kt_double y = startY + yIndex * rSearchSpaceResolution.GetY();
@@ -809,11 +811,39 @@ namespace karto
         Vector2<kt_int32s> gridPoint = m_pSearchSpaceProbs->WorldToGrid(Vector2<kt_double>(rSearchCenter.GetX() + x,
                                                                                            rSearchCenter.GetY() + y));
         kt_double response = *(m_pSearchSpaceProbs->GetDataPointer(gridPoint));
-
+        
         // response is not a low response
         if (response >= (bestResponse - 0.1))
         {
           norm += response;
+          dx+=x*response;
+          dy+=y*response;
+        }
+      }
+    }
+    
+    if(norm) {
+		dx/=norm;
+		dy/=norm;
+	}
+    
+    for (kt_int32u yIndex = 0; yIndex < nY; yIndex++)
+    {
+      kt_double y = startY + yIndex * rSearchSpaceResolution.GetY();
+
+      for (kt_int32u xIndex = 0; xIndex < nX; xIndex++)
+      {
+        kt_double x = startX + xIndex * rSearchSpaceResolution.GetX();
+
+        Vector2<kt_int32s> gridPoint = m_pSearchSpaceProbs->WorldToGrid(Vector2<kt_double>(rSearchCenter.GetX() + x,
+                                                                                           rSearchCenter.GetY() + y));
+        kt_double response = *(m_pSearchSpaceProbs->GetDataPointer(gridPoint));
+        
+        //std::cout<<(x - dx)<<" "<<(y - dy)<<" "<<response<<std::endl;
+
+        // response is not a low response
+        if (response >= (bestResponse - 0.1))
+        {
           accumulatedVarianceXX += (math::Square(x - dx) * response);
           accumulatedVarianceXY += ((x - dx) * (y - dy) * response);
           accumulatedVarianceYY += (math::Square(y - dy) * response);
@@ -888,6 +918,8 @@ namespace karto
 
     kt_double norm = 0.0;
     kt_double accumulatedVarianceThTh = 0.0;
+    
+    bestAngle=0;
     for (kt_int32u angleIndex = 0; angleIndex < nAngles; angleIndex++)
     {
       angle = startAngle + angleIndex * searchAngleResolution;
@@ -897,6 +929,20 @@ namespace karto
       if (response >= (bestResponse - 0.1))
       {
         norm += response;
+        bestAngle += angle*response;
+      }
+    }
+    
+    if(norm) bestAngle /= norm;
+    
+    for (kt_int32u angleIndex = 0; angleIndex < nAngles; angleIndex++)
+    {
+      angle = startAngle + angleIndex * searchAngleResolution;
+      kt_double response = GetResponse(angleIndex, gridIndex);
+
+      // response is not a low response
+      if (response >= (bestResponse - 0.1))
+      {
         accumulatedVarianceThTh += (math::Square(angle - bestAngle) * response);
       }
     }
