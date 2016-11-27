@@ -359,6 +359,9 @@ namespace karto
   Pose2 ComputeWeightedMean(const Pose2Vector& rMeans, const std::vector<Matrix3>& rCovariances)
   {
     assert(rMeans.size() == rCovariances.size());
+    
+    if(rMeans.size()==1)
+		return rMeans[0];
 
     // compute sum of inverses and create inverse list
     std::vector<Matrix3> inverses;
