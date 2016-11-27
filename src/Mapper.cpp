@@ -381,6 +381,7 @@ namespace karto
     Pose2 accumulatedPose;
     kt_double thetaX = 0.0;
     kt_double thetaY = 0.0;
+    kt_double ang_sum = 0.0;
 
     Pose2Vector::const_iterator meansIter = rMeans.begin();
     const_forEach(std::vector<Matrix3>, &inverses)
@@ -391,13 +392,16 @@ namespace karto
       Matrix3 weight = inverseOfSumOfInverses * (*iter);
       accumulatedPose += weight * pose;
       
-      thetaX += weight(2,2)*cos(angle);
-      thetaY += weight(2,2)*sin(angle);
+      double w_ang = std::sqrt(weight.dist2()-weight(2,2)*weight(2,2));
+      
+      thetaX += w_ang*weight(2,2)*cos(angle);
+      thetaY += w_ang*weight(2,2)*sin(angle);
+      ang_sum += w_ang;
 
       ++meansIter;
     }
 
-    accumulatedPose.SetHeading(atan2(thetaY, thetaX));
+    accumulatedPose.SetHeading(atan2(thetaY/ang_sum, thetaX/ang_sum));
 
     return accumulatedPose;
   }
