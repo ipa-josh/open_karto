@@ -2584,6 +2584,21 @@ namespace karto
 
       return product;
     }
+    
+    double dist2() const
+    {
+      double d=0;
+
+      for (size_t row = 0; row < 3; row++)
+      {
+        for (size_t col = 0; col < 3; col++)
+        {
+          d += math::Square(m_Matrix[row][col]);
+        }
+      }
+
+      return d;
+    }
 
 
     /**
