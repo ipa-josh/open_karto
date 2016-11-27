@@ -1043,7 +1043,8 @@ namespace karto
                         const LocalizedRangeScanVector& rBaseScans,
                         Pose2& rMean, Matrix3& rCovariance,
                         kt_bool doPenalize = true,
-                        kt_bool doRefineMatch = true);
+                        kt_bool doRefineMatch = true,
+                        kt_bool useOdometry = true);
 
     /**
      * Finds the best pose for the scan centering the search in the correlation grid
