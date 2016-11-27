@@ -1359,7 +1359,7 @@ namespace karto
       Pose2 bestPose;
       Matrix3 covariance;
       kt_double coarseResponse = m_pLoopScanMatcher->MatchScan(pScan, candidateChain,
-                                                               bestPose, covariance, false, false);
+                                                               bestPose, covariance, false, false, false);
 
       std::stringstream stream;
       stream << "COARSE RESPONSE: " << coarseResponse
@@ -1381,7 +1381,7 @@ namespace karto
         tmpScan.SetCorrectedPose(pScan->GetCorrectedPose());
         tmpScan.SetSensorPose(bestPose);  // This also updates OdometricPose.
         kt_double fineResponse = m_pMapper->m_pSequentialScanMatcher->MatchScan(&tmpScan, candidateChain,
-                                                                                bestPose, covariance, false);
+                                                                                bestPose, covariance, false, true, false);
 
         std::stringstream stream1;
         stream1 << "FINE RESPONSE: " << fineResponse << " (>"
@@ -1491,7 +1491,7 @@ namespace karto
       Pose2 mean;
       Matrix3 covariance;
       // match scan against "near" chain
-      kt_double response = m_pMapper->m_pSequentialScanMatcher->MatchScan(pScan, *iter, mean, covariance, false);
+      kt_double response = m_pMapper->m_pSequentialScanMatcher->MatchScan(pScan, *iter, mean, covariance, false, true, false);
       if (response > m_pMapper->m_pLinkMatchMinimumResponseFine->GetValue() - KT_TOLERANCE)
       {
         rMeans.push_back(mean);
