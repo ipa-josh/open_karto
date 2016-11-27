@@ -518,7 +518,6 @@ namespace karto
 #endif
     assert(math::InRange(rMean.GetHeading(), -KT_PI, KT_PI));
     
-    if( m_pMapper->m_pOdometryCovarianceDistance->GetValue()>0 && m_pMapper->m_pOdometryCovarianceAngular->GetValue()>0) {
     if( doRefineMatch && useOdometry && m_pMapper->m_pOdometryCovarianceDistance->GetValue()>0 && m_pMapper->m_pOdometryCovarianceAngular->GetValue()>0) {
       Pose2Vector means;
       std::vector<Matrix3> covariances;
