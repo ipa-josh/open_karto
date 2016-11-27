@@ -2480,6 +2480,7 @@ namespace karto
 
       if (fabs(fDet) <= fTolerance)
       {
+        rkInverse.Clear();
         return false;
       }
 
