@@ -410,7 +410,7 @@ namespace karto
    * @return strength of response
    */
   kt_double ScanMatcher::MatchScan(LocalizedRangeScan* pScan, const LocalizedRangeScanVector& rBaseScans, Pose2& rMean,
-                                   Matrix3& rCovariance, kt_bool doPenalize, kt_bool doRefineMatch)
+                                   Matrix3& rCovariance, kt_bool doPenalize, kt_bool doRefineMatch, kt_bool useOdometry)
   {
     ///////////////////////////////////////
     // set scan pose to be center of grid
@@ -512,6 +512,7 @@ namespace karto
     assert(math::InRange(rMean.GetHeading(), -KT_PI, KT_PI));
     
     if( m_pMapper->m_pOdometryCovarianceDistance->GetValue()>0 && m_pMapper->m_pOdometryCovarianceAngular->GetValue()>0) {
+    if( doRefineMatch && useOdometry && m_pMapper->m_pOdometryCovarianceDistance->GetValue()>0 && m_pMapper->m_pOdometryCovarianceAngular->GetValue()>0) {
       Pose2Vector means;
       std::vector<Matrix3> covariances;
 		
